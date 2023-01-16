@@ -22,7 +22,7 @@ export class Environment {
         }
     }
     lastAddr(): number {
-        console.log(this.addrs(), Math.max(...this.addrs()));
+        //console.log(this.addrs(), Math.max(...this.addrs()));
         if(this.addrs().length == 0) return 0;
         return Math.max(...this.addrs())+1;
     }

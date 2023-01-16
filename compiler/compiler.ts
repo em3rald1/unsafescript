@@ -1,8 +1,6 @@
 import { Statement, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr } from "../ast/ast.ts";
 import { CompilerValue, NumberVal, RegisterVal, LabelVal, toString } from "./cvalues.ts";
-//import { Variable, NumberVar, StringVar, PtrVar  } from "../runtime/vtype.ts";
 import { Environment } from "../runtime/dyn_environment.ts";
-import Parser from '../ast/parser.ts';
 
 export class Compiler {
     free_regs: boolean[] = [];
@@ -433,13 +431,3 @@ export class Compiler {
         }
     }
 }
-
-const parser = new Parser();
-const res = parser.parse('word x = 5; for(x > 0; x -= 1;) { asm "OUT %NUMB 1"; }');
-console.log(res);
-const compiler = new Compiler(7);
-const env = new Environment();
-compiler.compile(res, env);
-console.log(compiler);
-console.log(env);
-console.log(compiler.code+compiler.data_code);
