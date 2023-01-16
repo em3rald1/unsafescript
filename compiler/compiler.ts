@@ -317,7 +317,7 @@ export class Compiler {
             }
             case "FunDecl": {
                 const stmt = statement as FunDecl;
-                this.code += `.${stmt.name}\n`;
+                this.code += `HLT\n.${stmt.name}\n`;
                 const nenv = new Environment(env);
                 this.code += `PSH R${this.frame_pointer}\nMOV R${this.frame_pointer} SP\n`;
                 for(let i = 0; i < stmt.params.length; i++) {
