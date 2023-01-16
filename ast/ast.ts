@@ -2,26 +2,25 @@ import { VType } from "../runtime/vtype.ts"
 
 export type NodeType =
     // Statement 
-    | "VarDecl" // compiled (6/10 done, 60%)
+    | "VarDecl" // compiled (8/9 done, 88.89%)
     | "FunDecl" // compiled
     | "Program" // compiled
     | "ReturnStatement" // compiled
     | "DelStatement" // compiled
     | "ASMLine" // compiled
     | "ForStatement"
-    | "WhileStatement"
-    | "IfStatement"
-    | "ElseStatement"
+    | "WhileStatement" // compiled
+    | "IfStatement" // compiled
     // Expressions
-    | "BinaryExpr" // compiled (6/9 done, 66.67%)
+    | "BinaryExpr" // compiled (9/9 done, 100%)
     | "MemberExpr" // compiled
     | "CallExpr" // compiled
     | "AssignExpr" // compiled
-    | "BinOpAssignExpr"
+    | "BinOpAssignExpr" // compiled
     | "NotExpr" // compiled
     | "ComparisonExpr" // compiled
-    | "LogicalExpr"
-    | "BitwiseExpr"
+    | "LogicalExpr" // compiled
+    | "BitwiseExpr" // compiled
     // Literals
     | "NumericLiteral" // compiled (6/6 done, 100%)
     | "IdentLiteral"  // compiled
@@ -86,11 +85,8 @@ export interface WhileStatement extends Statement {
 export interface IfStatement extends Statement {
     type: "IfStatement",
     condition: Expr,
-    body: Statement[];
-}
-export interface ElseStatement extends Statement {
-    type: "ElseStatement",
-    body: Statement[];
+    ifbody: Statement[],
+    elsebody?: Statement[];
 }
 // Expressions
 

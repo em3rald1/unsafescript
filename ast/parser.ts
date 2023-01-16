@@ -1,4 +1,4 @@
-import { Statement, Expr, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, NullLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, ElseStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr } from "./ast.ts";
+import { Statement, Expr, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, NullLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr } from "./ast.ts";
 import { TokenType, Token } from "../text/tokens.ts";
 import { tokenize } from "../text/lexer.ts";
 import { VType } from "../runtime/vtype.ts";
@@ -163,29 +163,27 @@ export default class Parser {
         this.expect(TokenType.OpenParen, "Open parenthesis expected after if keyword");
 
         const condition = this.parse_expr();
-        const body: Statement[] = [];
+        const ifbody: Statement[] = [];
         this.expect(TokenType.CloseParen, "Close parenthesis expected after if condition");
         this.expect(TokenType.OpenBrace, "If keyword body expected");
 
         while(!this.eof() && this.at().type != TokenType.CloseBrace) {
-            body.push(this.parse_statement());
+            ifbody.push(this.parse_statement());
         }
         this.eat();
 
-        return { type: "IfStatement", condition, body } as IfStatement;
-    }
+        const elsebody: Statement[] = [];
 
-    private parse_else_statement(): Statement {
-        this.eat();
-        const body: Statement[] = [];
-        this.expect(TokenType.OpenBrace, "Else keyword body expected");
-
-        while(!this.eof() && this.at().type != TokenType.CloseBrace) {
-            body.push(this.parse_statement());
+        if(this.at().type == TokenType.ElseToken) {
+            this.eat();
+            this.expect(TokenType.OpenBrace, "Else keyword body expected");
+            while(!this.eof() &&  this.at().type != TokenType.CloseBrace) {
+                elsebody.push(this.parse_statement());
+            }
+            this.eat();
         }
-        this.eat();
-
-        return { type: "ElseStatement", body } as ElseStatement;
+        if(elsebody.length > 0) return { type: "IfStatement", condition, ifbody, elsebody } as IfStatement;
+        return { type: "IfStatement", condition, ifbody } as IfStatement;
     }
     private parse_statement(): Statement {
         switch(this.at().type) {
@@ -207,8 +205,6 @@ export default class Parser {
                 return this.parse_while_statement();
             case TokenType.IfToken:
                 return this.parse_if_statement();
-            case TokenType.ElseToken:
-                return this.parse_else_statement();
             default: return this.parse_expr();
         }
     }
