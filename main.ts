@@ -10,7 +10,7 @@ if(Deno.args.length > 0) {
         const program = new Parser().parse(code);
         const compiler = new Compiler(8);
         compiler.compile(program, env);
-        console.log(compiler.code);
+        console.log(compiler.fuse_code());
     } else {
         const env = new Environment();
         const codeRaw = Deno.readFileSync(Deno.args[0]);
@@ -18,7 +18,7 @@ if(Deno.args.length > 0) {
         const program = new Parser().parse(code);
         const compiler = new Compiler(parseInt(Deno.args[1]));
         compiler.compile(program, env);
-        console.log(compiler.code);
+        console.log(compiler.fuse_code());
     }
 } else {
     console.error("Usage: deno run -A main.ts <file> <amount of registers, default to 8>");

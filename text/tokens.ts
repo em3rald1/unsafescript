@@ -7,6 +7,7 @@ export enum TokenType {
     CharToken,
 
     // keywords
+    ImportToken,
     FunctionToken,
     DeleteToken,
     WordToken,

@@ -3,14 +3,14 @@ import { isNumber } from "./textutil.ts";
 
 const keywords: {[key: string]: TokenType} = {
     word: TokenType.WordToken, // parsed
-    int16: TokenType.WordToken, // parsed
+    import: TokenType.ImportToken,
     ptr: TokenType.PtrToken, // parsed
     str: TokenType.StrToken,
-    fn: TokenType.FunctionToken, // parsed
-    ret: TokenType.ReturnToken, // parsed
+    fun: TokenType.FunctionToken, // parsed
+    return: TokenType.ReturnToken, // parsed
     asm: TokenType.ASMToken, // parsed
     for: TokenType.ForToken, // parsed
-    del: TokenType.DeleteToken, // parsed
+    delete: TokenType.DeleteToken, // parsed
     while: TokenType.WhileToken, // parsed
     if: TokenType.IfToken, // parsed
     else: TokenType.ElseToken // parsed

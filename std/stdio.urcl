@@ -1,0 +1,21 @@
+JMP .print_end
+.print
+    LLOD R1 SP 1
+    .print_loop
+        LOD R2 R1
+        BRZ .print_ret R2
+        OUT %TEXT R2
+        INC R1 R1
+        JMP .print_loop
+    .print_ret
+        RET
+
+.printnum
+    LLOD R1 SP 1
+    OUT %NUMB R1
+    RET
+
+.printnl
+    OUT %TEXT 0x0a
+    RET
+.print_end

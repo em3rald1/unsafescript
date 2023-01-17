@@ -1,11 +1,16 @@
-word x = 5;
-x = main()
-asm "HLT";
-fn main() {
-    word y = x + 1;
-    if(y < 1) {
-        ret 1;
-    } else {
-        ret 0;
+import stdio;
+
+word i = 5;
+word x = fib(i);
+printnum(i);
+printnl();
+printnum(x);
+
+fun fib(word n) {
+    if(n < 2) {
+        return n;
     }
+    word w1 = fib(n-1);
+    word w2 = fib(n-2);
+    return w1 + w2;
 }

@@ -2,15 +2,16 @@ import { VType } from "../runtime/vtype.ts"
 
 export type NodeType =
     // Statement 
-    | "VarDecl" // compiled (8/9 done, 88.89%)
+    | "VarDecl" // compiled (9/10 done, 90%)
     | "FunDecl" // compiled
     | "Program" // compiled
     | "ReturnStatement" // compiled
     | "DelStatement" // compiled
     | "ASMLine" // compiled
-    | "ForStatement"
+    | "ForStatement" // compiled
     | "WhileStatement" // compiled
     | "IfStatement" // compiled
+    | "ImportStatement"
     // Expressions
     | "BinaryExpr" // compiled (9/9 done, 100%)
     | "MemberExpr" // compiled
@@ -27,7 +28,10 @@ export type NodeType =
     | "StringLiteral" // compiled
     | "CharLiteral" // compiled
     | "ArrayLiteral" // compiled
-    | "NullLiteral"; // compiled
+    | "NullLiteral" // compiled
+    
+    // Special symbols
+    | "Semicolon";
 
 // Statements
 
@@ -87,6 +91,12 @@ export interface IfStatement extends Statement {
     condition: Expr,
     ifbody: Statement[],
     elsebody?: Statement[];
+}
+
+export interface ImportStatement extends Statement {
+    type: "ImportStatement",
+    value: string,
+    builtin: boolean
 }
 // Expressions
 
@@ -180,4 +190,8 @@ export interface CallExpr extends Expr {
     type: "CallExpr",
     caller: Expr,
     args: Expr[],
+}
+
+export interface Semicolon extends Expr {
+    type: "Semicolon",
 }

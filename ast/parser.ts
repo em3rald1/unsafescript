@@ -1,4 +1,4 @@
-import { Statement, Expr, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, NullLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr } from "./ast.ts";
+import { Statement, Expr, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, NullLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr, ImportStatement, Semicolon } from "./ast.ts";
 import { TokenType, Token } from "../text/tokens.ts";
 import { tokenize } from "../text/lexer.ts";
 import { VType } from "../runtime/vtype.ts";
@@ -185,6 +185,19 @@ export default class Parser {
         if(elsebody.length > 0) return { type: "IfStatement", condition, ifbody, elsebody } as IfStatement;
         return { type: "IfStatement", condition, ifbody } as IfStatement;
     }
+    private parse_import_statement(): Statement {
+        this.eat();
+        const val = this.eat();
+        this.expect(TokenType.Semicolon, "Expected semicolon after import statement");
+        if(val.type == TokenType.StringToken) {
+            return { type: "ImportStatement", value: val.value, builtin: false } as ImportStatement;
+        } else if(val.type == TokenType.IdentToken) {
+            return { type: "ImportStatement", value: val.value, builtin: true } as ImportStatement;
+        } else {
+            console.error(`Can not import value of type ${val.type}`);
+            Deno.exit(1);
+        }
+    }
     private parse_statement(): Statement {
         switch(this.at().type) {
             case TokenType.WordToken:
@@ -205,6 +218,8 @@ export default class Parser {
                 return this.parse_while_statement();
             case TokenType.IfToken:
                 return this.parse_if_statement();
+            case TokenType.ImportToken:
+                return this.parse_import_statement();
             default: return this.parse_expr();
         }
     }
@@ -414,7 +429,7 @@ export default class Parser {
             }
             case TokenType.Semicolon: {
                 this.eat();
-                return { type: "NullLiteral", value: null } as NullLiteral;
+                return { type: "Semicolon" } as Semicolon;
             }
             case TokenType.OpenParen: {
                 this.eat();

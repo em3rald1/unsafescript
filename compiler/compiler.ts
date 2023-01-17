@@ -1,4 +1,4 @@
-import { Statement, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr } from "../ast/ast.ts";
+import { Statement, Program, NumericLiteral, MemberExpr, CallExpr, IdentLiteral, BinaryExpr, StringLiteral, CharLiteral, VarDecl, FunDecl, ArrayLiteral, ReturnStatement, DelStatement, AssignExpr, ASMLine, ComparisonExpr, ForStatement, WhileStatement, IfStatement, LogicalExpr, BinOpAssignExpr, BitwiseExpr, NotExpr, ImportStatement } from "../ast/ast.ts";
 import { CompilerValue, NumberVal, RegisterVal, LabelVal, toString } from "./cvalues.ts";
 import { Environment } from "../runtime/dyn_environment.ts";
 
@@ -7,6 +7,7 @@ export class Compiler {
     frame_pointer = 0;
     code = "";
     data_code = "";
+    import_code = "";
     strings = 0;
     arrays = 0;
     if_stmts = 0;
@@ -38,7 +39,7 @@ export class Compiler {
                 return { type: "number", value: (statement as CharLiteral).value.charCodeAt(0) } as NumberVal;
             }
             case "StringLiteral": {
-                this.data_code += `.string_${++this.strings}\nDW "${(statement as StringLiteral).value}"\n`;
+                this.data_code += `.string_${++this.strings}\nDW [ "${(statement as StringLiteral).value}" 0 ]\n`;
                 return { type:'label', value: `.string_${this.strings}`} as LabelVal;
             }
             case "IdentLiteral": {
@@ -50,12 +51,10 @@ export class Compiler {
                 const addr = env.read((statement as IdentLiteral).value).addr+1;
 
                 const depth = env.getVarDepth((statement as IdentLiteral).value);
-                let curEnv = env;
                 const reg2 = depth > 0 ? this.allocateReg() : 0;
                 for(let i = 0; i < depth; i++) {
                     this.code += `LOD R${reg2} R${lfp}\n`;
                     lfp = reg2;
-                    curEnv = curEnv.parent as Environment;
                 }
                 const reg = this.allocateReg();
                 this.code += `LLOD R${reg} R${lfp} -${addr}\n`;
@@ -306,6 +305,27 @@ export class Compiler {
                     break;
                 }
             }
+            case "ImportStatement": {
+                const stmt = statement as ImportStatement;
+                if(stmt.builtin) {
+                    switch(stmt.value) {
+                        case "stdio": {
+                            const codeRaw = Deno.readFileSync("std/stdio.urcl");
+                            const code = new TextDecoder().decode(codeRaw);
+                            this.import_code += code;
+                            break;
+                        }
+                        default: {
+                            console.error(`Builtin library ${stmt.value} does not exist`);
+                            Deno.exit(1);
+                        }
+                    }
+                } else {
+                    console.error("Not builtin imports are not supported yet");
+                    Deno.exit(1);
+                }
+                return { type: "register", value: 0 } as RegisterVal;
+            }
             // statements
             case "Program": {
                 const stmt = statement as Program;
@@ -317,7 +337,7 @@ export class Compiler {
             }
             case "FunDecl": {
                 const stmt = statement as FunDecl;
-                this.code += `HLT\n.${stmt.name}\n`;
+                this.code += `JMP .${stmt.name}_end\n.${stmt.name}\n`;
                 const nenv = new Environment(env);
                 this.code += `PSH R${this.frame_pointer}\nMOV R${this.frame_pointer} SP\n`;
                 for(let i = 0; i < stmt.params.length; i++) {
@@ -331,6 +351,8 @@ export class Compiler {
                 for(const bstmt of stmt.body) {
                     this.compile(bstmt, nenv);
                 }
+
+                this.code += `.${stmt.name}_end\n`;
                 return { type: "register", value: 0 } as RegisterVal;
             }
             case "VarDecl": {
@@ -424,10 +446,19 @@ export class Compiler {
                 this.code += `.while_end_${this.while_stmts++}\n`;
                 return { type: "register", value: 0 } as RegisterVal;
             }
+
+            // special symbols
+            case "Semicolon": {
+                this.freeAll();
+                return { type: "register", value: 0} as RegisterVal;
+            }
             default: {
                 console.error("Received ast node not supported for compiling!", statement);
                 Deno.exit(1);
             }
         }
+    }
+    fuse_code() {
+        return this.code + this.data_code + this.import_code;
     }
 }
