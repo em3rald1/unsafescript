@@ -53,7 +53,7 @@ export class Compiler {
                 let curEnv = env;
                 const reg2 = depth > 0 ? this.allocateReg() : 0;
                 for(let i = 0; i < depth; i++) {
-                    this.code += `LLOD R${reg2} SP ${curEnv.vars.size}\n`;
+                    this.code += `LOD R${reg2} R${lfp}\n`;
                     lfp = reg2;
                     curEnv = curEnv.parent as Environment;
                 }
@@ -137,7 +137,7 @@ export class Compiler {
                     let curEnv = env;
                     const reg = this.allocateReg();
                     for(let i = 0; i < depth; i++) {
-                        this.code += `LLOD R${reg} SP ${curEnv.vars.size}\n`;
+                        this.code += `LOD R${reg} R${lfp}\n`;
                         lfp = reg;
                         curEnv = curEnv.parent as Environment;
                     }
@@ -281,7 +281,7 @@ export class Compiler {
                     const reg = depth > 0 ? this.allocateReg() : 0;
                     let curEnv = env;
                     for(let i = 0; i < depth; i++) {
-                        this.code += `LLOD R${reg} SP ${curEnv.vars.size}\n`;
+                        this.code += `LOD R${reg} R${lfp}\n`;
                         lfp = reg;
                         curEnv = curEnv.parent as Environment;
                     }
