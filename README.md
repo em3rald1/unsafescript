@@ -6,6 +6,10 @@ A parody to javascript or assemblyscript but allowing accessing any memory addre
 
 Syntax:
 Variable types: `word`, `ptr`, `str`
+Standard input/output (WIP):
+```
+import stdio;
+```
 Declaration of variable:
 ```
 word varname = 5;
