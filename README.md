@@ -5,7 +5,6 @@ A parody to javascript or assemblyscript but allowing accessing any memory addre
 `$ deno run -A main.ts <file> <max register count - 1>`
 
 Syntax:
-Semicolon are going after statements (e.g variable declaration, return statement, delete statement, assembly line statement), semicolons can't go after expressions (e.g 5 + 3, function calls)
 Variable types: `word`, `ptr`, `str`
 Declaration of variable:
 ```
@@ -16,10 +15,10 @@ str strname = "hello world";
 
 Function declaration:
 ```
-fn functionname() {
+fun functionname() {
   word x = 5;
   x -= 1
-  ret x;
+  return x;
 }
 ```
 
@@ -53,7 +52,7 @@ else {
 
 Delete variable:
 ```
-del varname;
+delete varname;
 ```
 
 Using assembly in code (1 line at a time):
